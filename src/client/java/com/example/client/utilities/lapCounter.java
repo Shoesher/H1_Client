@@ -25,6 +25,8 @@ public class lapCounter {
     private Block standingBlock;
     private AtomicBoolean isOnCooldown = new AtomicBoolean(false);
     private Timer timer = new Timer();
+    private int targetTicks = 100;
+    private int ticksCounter = targetTicks + 1;
 
     private void coordsLapCounter(BlockPos location){
         //Use map to determine target laps
@@ -43,33 +45,31 @@ public class lapCounter {
 
     public void lapCooldownManager(){
         //flips a variable based on timing
-        timer.schedule(
-            new TimerTask() {
-               @Override
-               public void run() {
-               isOnCooldown.set(true);
-               timer.cancel();
-               }
-           }, 30000
-        );
+        if(ticksCounter > targetTicks){
+            isOnCooldown.set(false);
+        }
+        else{
+            isOnCooldown.set(true);
+        }
     }
 
     private void blockLapCounter(){
+        ticksCounter++;
         int targetLaps = mainBlockMap.raceBlocks.get(standingBlock);
         if (playerLaps < targetLaps){
             //If the player crosses the finsh line that's not on cool down
             if(getValidBlock() && !isOnCooldown.get()) {
                 playerLaps += 1;
+                ticksCounter = 0;
                 client.getConnection().sendChat(getLapData());
                 //start a new cool down
-                lapCooldownManager();
                 board.updateLeaderboard();
             }
         }
         else{
             locator.teleportLobby();
-            score.calcPoints(board.finalPos);
-            score.displayPoints();
+            //score.calcPoints(board.finalPos);
+            //score.displayPoints();
             resetLapCounter();
         }
     }
@@ -82,14 +82,16 @@ public class lapCounter {
 
     private boolean getValidBlock(){
         boolean onValidBlock = false;
-
-        standingBlock = client.player.getBlockStateOn().getBlock();
+        BlockPos targetBlock = client.player.blockPosition().below(1);
+        standingBlock = client.level.getBlockState(targetBlock).getBlock();
         return mainBlockMap.raceBlocks.containsKey(standingBlock);
     }
 
     //run periodically
     public void runLapCounter(){
         //Add while conditional, that resets the lap counting system based on laps
+        ticksCounter++;
+        lapCooldownManager();
         if(!getValidBlock()){
             return;
         }

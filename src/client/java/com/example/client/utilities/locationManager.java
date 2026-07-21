@@ -3,13 +3,15 @@ package com.example.client.utilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import com.example.client.constants.locations;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.phys.Vec3;
 
 public class locationManager {
     private static locationManager locator = null;
     Minecraft client = Minecraft.getInstance();
 
     public void teleportLobby(){
-        client.player.teleportTo(locations.lobbyX,locations.lobbyY,locations.lobbyZ);
+        client.getConnection().sendCommand("teleport " + locations.lobbyX + " " + locations.lobbyY + " " + locations.lobbyZ);
     }
 
     public void teleportMap(){
