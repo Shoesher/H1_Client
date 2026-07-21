@@ -11,13 +11,23 @@ public class chatManager {
     private static String lapTemplate = formatting.PREFIX;
 
     private static boolean authenticateCommand(String command){
-        if(scoreboardTemplate.matcher(command.trim()).matches() || command.startsWith(lapTemplate)){
+        if(scoreboardTemplate.matcher(command.trim()).matches()){
             return false;
         }
         return true;
     }
 
+    private static boolean authenticateMessage(String message){
+        if(message.startsWith(lapTemplate)){
+            return false;
+        }
+        return true;
+    }
+
+
+
     public void registerCommands(){
         ClientSendMessageEvents.ALLOW_COMMAND.register(chatManager::authenticateCommand);
+        ClientSendMessageEvents.ALLOW_CHAT.register(chatManager::authenticateMessage);
     }
 }

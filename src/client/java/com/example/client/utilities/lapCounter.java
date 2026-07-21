@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class lapCounter {
     private static lapCounter laps = null;
 
-    private int playerLaps = 0;
+    public int playerLaps = 0;
+    public int targetLaps = 0;
     private Minecraft client = Minecraft.getInstance();
     private blocksMap mainBlockMap = blocksMap.getInstance();
     private locationManager locator = locationManager.getInstance();
@@ -55,7 +56,7 @@ public class lapCounter {
 
     private void blockLapCounter(){
         ticksCounter++;
-        int targetLaps = mainBlockMap.raceBlocks.get(standingBlock);
+        targetLaps = mainBlockMap.raceBlocks.get(standingBlock);
         if (playerLaps < targetLaps){
             //If the player crosses the finsh line that's not on cool down
             if(getValidBlock() && !isOnCooldown.get()) {
@@ -63,13 +64,13 @@ public class lapCounter {
                 ticksCounter = 0;
                 client.getConnection().sendChat(getLapData());
                 //start a new cool down
-                board.updateLeaderboard();
+                //board.updateLeaderboard();
             }
         }
         else{
             locator.teleportLobby();
-            //score.calcPoints(board.finalPos);
-            //score.displayPoints();
+            score.calcPoints(board.finalPos);
+            score.displayPoints();
             resetLapCounter();
         }
     }
@@ -77,6 +78,7 @@ public class lapCounter {
     private void resetLapCounter(){
         //resets everything to the original starting point for the next race
         playerLaps = 0;
+        targetLaps = 0;
         isOnCooldown.set(false);
     }
 

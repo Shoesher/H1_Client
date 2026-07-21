@@ -17,14 +17,14 @@ public class scoreManager {
     }
 
     public void displayPoints(){
-        //write data to local json file
-        client.getConnection().sendCommand("scoreboard players set " + client.getUser().getName() + " Points: " + playerPoints);
+        client.getConnection().sendCommand("scoreboard players set " + client.getUser().getName() + " Points " + playerPoints);
     }
 
     //key = finishing position
     //value = points
     Map<Integer, Integer> pointMap = new HashMap<>(
         Map.ofEntries(
+            Map.entry(0,0),
             Map.entry(1, 20),
             Map.entry(2, 18),
             Map.entry(3, 16),
