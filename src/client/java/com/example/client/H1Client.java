@@ -27,10 +27,5 @@ public class H1Client implements ClientModInitializer {
 				Identifier.fromNamespaceAndPath("h1client", "race_leaderboard"),
 				leaderboardManager.getInstance()::displayLeaderboard
 		);
-
-		ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
-			// A new chat message just arrived in HUD—now update!
-			leaderboardManager.getInstance().updateLeaderboard();
-		});
 	}
 }

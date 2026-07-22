@@ -24,7 +24,7 @@ public class chatManager {
         return true;
     }
 
-
+    //prevent self typed /tp or /scoreboard
 
     public void registerCommands(){
         ClientSendMessageEvents.ALLOW_COMMAND.register(chatManager::authenticateCommand);
