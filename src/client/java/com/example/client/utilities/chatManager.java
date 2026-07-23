@@ -3,6 +3,8 @@ package com.example.client.utilities;
 import com.example.client.constants.formatting;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.game.ClientboundPlayerChatPacket;
+
 import java.util.regex.Pattern;
 
 public class chatManager {

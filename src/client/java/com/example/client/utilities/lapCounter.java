@@ -40,8 +40,7 @@ public class lapCounter {
         //Construct a message which includes all major race data
         //return as a string
         String username = client.getUser().getName();
-        String lapData = formatting.PREFIX + username + formatting.SEPERATOR + playerLaps;
-        return lapData;
+        return formatting.PREFIX + formatting.SEPERATOR + playerLaps;
     }
 
     public void lapCooldownManager(){
