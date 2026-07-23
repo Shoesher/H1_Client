@@ -14,7 +14,7 @@ import net.minecraft.resources.Identifier;
 public class H1Client implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		//new chatManager().registerCommands();
+		new chatManager().registerCommands();
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (client.level == null) return;
@@ -27,5 +27,11 @@ public class H1Client implements ClientModInitializer {
 				Identifier.fromNamespaceAndPath("h1client", "race_leaderboard"),
 				leaderboardManager.getInstance()::displayLeaderboard
 		);
+
+		ClientReceiveMessageEvents.GAME.register((message, isOverlay) -> {
+			if (!isOverlay) {
+
+			}
+		});
 	}
 }

@@ -1,43 +1,40 @@
 package com.example.client.utilities;
 
+import com.example.client.constants.formatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.util.ARGB;
-import net.minecraft.world.scores.Objective;
-import net.minecraft.world.scores.ScoreHolder;
-import net.minecraft.world.scores.Scoreboard;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class leaderboardManager {
     private static leaderboardManager board = null;
     Minecraft client = Minecraft.getInstance();
     public int finalPos = 1;
+    public List<String> chatHistory;
 
     public void updateLeaderboard(){
-        if(client.level == null || client.player == null) return;
+        if(chatHistory.isEmpty()) return;
+        LapData selfEntry = parseLapData(chatHistory.get(0));
+        if(selfEntry == null) return;
 
-        Scoreboard scoreboard = client.level.getScoreboard();
-        Objective objective = scoreboard.getObjective("laps");
-        if(objective == null) return; // datapack hasn't loaded/created it yet
-
-        ArrayList<Integer> playerLevels = new ArrayList<>();
+        int userLap = selfEntry.lap();
+        Set<String> seenUsers = new HashSet<>();
+        seenUsers.add(selfEntry.username());
         int aheadCount = 0;
-        int playerLevel = lapCounter.getInstance().playerLaps;
 
-        for(PlayerInfo racer : client.getConnection().getOnlinePlayers()){
-            if(racer.getProfile().id().equals(client.player.getUUID())) continue;
-            if(racer.getGameMode().isSurvival()){
-                String name = racer.getProfile().name();
-                ScoreHolder holder = ScoreHolder.forNameOnly(name);
-                int rivalLevel = scoreboard.getOrCreatePlayerScore(holder, objective).get();
-                playerLevels.add(rivalLevel);
+        for(int i = 1; i < chatHistory.size(); i++){
+            LapData entry = parseLapData(chatHistory.get(i));
+            if(entry == null) continue;
+
+            if(seenUsers.contains(entry.username())){
+                break;
             }
-        }
+            seenUsers.add(entry.username());
 
-        for(int rivalLevel : playerLevels){
-            if(rivalLevel >= playerLevel){
+            if(entry.lap() >= userLap){
                 aheadCount++;
             }
         }
@@ -45,8 +42,25 @@ public class leaderboardManager {
         getPosFromIndex(aheadCount);
     }
 
+    public void clearLapLogs(){
+        chatHistory.clear();
+    }
+
+    private LapData parseLapData(String rawMessage){
+        if(!rawMessage.startsWith(formatting.PREFIX)) return null;
+        String[] parts = rawMessage.substring(formatting.PREFIX.length()).split(formatting.SEPERATOR);
+        if(parts.length != 2) return null;
+        try {
+            return new LapData(parts[0], Integer.parseInt(parts[1]));
+        } catch (NumberFormatException e){
+            return null;
+        }
+    }
+
+    private record LapData(String username, int lap){}
+
     private void getPosFromIndex(int aheadCount){
-        this.finalPos = 1 + aheadCount;
+        finalPos += aheadCount;
     }
 
     public void displayLeaderboard(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker){
@@ -55,6 +69,8 @@ public class leaderboardManager {
         int x1 = 10;
         int y1 = 10;
         int y2 = 30;
+
+        // 0xFFFFFF was RGB-only and would render invisible now - needs an alpha channel
         graphics.text(client.font, text1, x1, y1, ARGB.color(255, 248, 205, 2));
         graphics.text(client.font, text2, x1, y2, ARGB.color(255, 255, 190, 125));
     }

@@ -1,10 +1,15 @@
 package com.example.client.utilities;
 
+import com.example.client.constants.formatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 import com.example.client.constants.blocksMap;
+
+import java.util.Map;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class lapCounter {
@@ -31,6 +36,14 @@ public class lapCounter {
         //If the active laps is greater than the target laps, run score manager, run location manager
     }
 
+    public String getLapData(){
+        //Construct a message which includes all major race data
+        //return as a string
+        String username = client.getUser().getName();
+        String lapData = formatting.PREFIX + username + formatting.SEPERATOR + playerLaps;
+        return lapData;
+    }
+
     public void lapCooldownManager(){
         //flips a variable based on timing
         if(ticksCounter > targetTicks){
@@ -42,12 +55,15 @@ public class lapCounter {
     }
 
     private void blockLapCounter(){
+        ticksCounter++;
         targetLaps = mainBlockMap.raceBlocks.get(standingBlock);
         if (playerLaps < targetLaps){
+            //If the player crosses the finsh line that's not on cool down
             if(getValidBlock() && !isOnCooldown.get()) {
                 playerLaps += 1;
                 ticksCounter = 0;
-                client.getConnection().sendCommand("trigger laps set " + playerLaps);
+                client.getConnection().sendChat(getLapData());
+                //start a new cool down
                 board.updateLeaderboard();
             }
         }
@@ -60,11 +76,11 @@ public class lapCounter {
     }
 
     private void resetLapCounter(){
+        //resets everything to the original starting point for the next race
         playerLaps = 0;
         targetLaps = 0;
+        board.clearLapLogs();
         isOnCooldown.set(false);
-        ticksCounter = targetTicks + 1;
-        client.getConnection().sendCommand("trigger laps set 0");
     }
 
     private boolean getValidBlock(){
@@ -76,7 +92,6 @@ public class lapCounter {
 
     //run periodically
     public void runLapCounter(){
-        //Add while conditional, that resets the lap counting system based on laps
         ticksCounter++;
         lapCooldownManager();
         if(!getValidBlock()){
