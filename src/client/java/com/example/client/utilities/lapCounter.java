@@ -38,7 +38,6 @@ public class lapCounter {
 
     public String getLapData(){
         //Construct a message which includes all major race data
-        //return as a string
         String username = client.getUser().getName();
         return formatting.PREFIX + formatting.SEPERATOR + playerLaps;
     }
@@ -63,7 +62,6 @@ public class lapCounter {
                 ticksCounter = 0;
                 client.getConnection().sendChat(getLapData());
                 //start a new cool down
-                board.updateLeaderboard();
             }
         }
         else{
