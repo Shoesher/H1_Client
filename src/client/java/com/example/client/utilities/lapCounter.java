@@ -77,6 +77,7 @@ public class lapCounter {
         playerLaps = 0;
         targetLaps = 0;
         board.clearLapLogs();
+        ticksCounter = targetTicks + 1;
         isOnCooldown.set(false);
     }
 

@@ -1,5 +1,6 @@
 package com.example.client;
 
+import com.example.client.constants.formatting;
 import com.example.client.utilities.chatManager;
 import com.example.client.utilities.leaderboardManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -14,24 +15,23 @@ import net.minecraft.resources.Identifier;
 public class H1Client implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-//		new chatManager().registerCommands();
+		//new chatManager().registerCommands();
 
-        // Triggers for system messages (e.g., server announcements, warps, mini-game alerts)
         ClientReceiveMessageEvents.GAME.register((message, isOverlay) -> {
-            if (!isOverlay) {
-                //Prints out the contents of the chat message
-                System.out.println(message.getSiblings().getFirst().getString());
-                leaderboardManager.getInstance().parseLapData(message.getSiblings().getFirst().getString());
-            }
+            //Sends message content to the leaderboard manager list
+            if (isOverlay) return;
+            leaderboardManager.getInstance().parseLapData(message.getString());
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            //periodic
             if (client.level == null) return;
             if (client.player == null) return;
             lapCounter.getInstance().runLapCounter();
         });
 
         HudElementRegistry.attachElementBefore(
+                //Visuals
                 VanillaHudElements.CHAT,
                 Identifier.fromNamespaceAndPath("h1client", "race_leaderboard"),
                 leaderboardManager.getInstance()::displayLeaderboard
